@@ -1,5 +1,5 @@
 
-struct SmoothingResult <: SmoothingResultBase
+struct SmoothingResult
     smoothingResultBase::SmoothingResultBase
     iterations::Int
 
@@ -9,7 +9,7 @@ struct SmoothingResult <: SmoothingResultBase
         smoothingWallClockTimeInSeconds::Float64,
         iterations::Int)
         new(
-            SmoothingResultBase(algorithmName, mesh, smoothingWallClockTimeInSeconds)
+            SmoothingResultBase(algorithmName, mesh, smoothingWallClockTimeInSeconds),
             iterations
         )
     end

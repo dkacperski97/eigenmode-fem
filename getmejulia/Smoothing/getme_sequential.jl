@@ -12,18 +12,18 @@ mutable struct GetmeSequential
     config::GetmeSequentialConfig
     minHeap::PolygonQualityMinHeap
     isNodeFixed::Vector{Bool}
-    temporaryNodes::Vector{Mesh.Node}
+    temporaryNodes::Vector{Mathematics.Vector2D}
     smoothingTimeInSeconds::Float64
     iterationsApplied::Int
 end
 
 function GetmeSequential(mesh::Mesh.PolygonalMesh, config::GetmeSequentialConfig)
     minHeap = PolygonQualityMinHeap(mesh)
-    getme = GetmeSequential(mesh, config, minHeap, Vector{Bool}(), Vector{Mesh.Node}(), 0.0, 0)
+    getme = GetmeSequential(mesh, config, minHeap, Vector{Bool}(), Vector{Mathematics.Vector2D}(), 0.0, 0)
     checkInputData(getme)
     initHelperData(getme)
     applySmoothing(getme)
-    @assert getme.minHeap.isConsistent(), "Inconsistent min heap."
+    @assert isConsistent(getme.minHeap) "Inconsistent min heap."
     return getme
 end
 
@@ -32,8 +32,9 @@ function getResult(getme::GetmeSequential)
 end
 
 function checkInputData(getme::GetmeSequential)
-    @assert !minHeap.containsAnInvalidPolygon(), "GETMe sequential can only be applied to valid initial meshes."
-    @assert getme.config.qualityEvaluationCycleLength < getme.config.maxIterations, "Quality evaluation cycle length must be <= maximal number of iterations."
+    check = containsAnInvalidPolygon(getme.minHeap)
+    @assert !check "GETMe sequential can only be applied to valid initial meshes."
+    @assert getme.config.qualityEvaluationCycleLength < getme.config.maxIterations "Quality evaluation cycle length must be <= maximal number of iterations."
     checkTransformations(getme.mesh, getme.config.polygonTransformations)
 end
 
@@ -71,6 +72,7 @@ function applySmoothing(getme::GetmeSequential)
         if !localQualityInfo.areAllElementsValid
             copyNodes(getme, transformedPolygonIndex, getme.mesh.nodes, getme.temporaryNodes)
             addToPenaltySum(getme.minHeap, transformedPolygonIndex, getme.config.penaltyInvalid)
+            dump("INVALID ELEMENT ! ! ! ! ! ! ! ! ! ! !")
         else
             copyNodes(getme, transformedPolygonIndex, getme.temporaryNodes, getme.mesh.nodes)
             updateMeanRatioNumberAndAddToPenaltySum(
@@ -81,9 +83,9 @@ function applySmoothing(getme::GetmeSequential)
             for (polygonIndex, newMeanRatioNumber) in localQualityInfo.neighborElementIndexAndMeanRatioNumber
                 updateMeanRatioNumberIfNotFixedPolygon(getme.minHeap, polygonIndex, newMeanRatioNumber)
             end
+            # dump(isConsistent(getme.minHeap))
         end
         lastTransformedPolygonIndex = transformedPolygonIndex
-
         if iteration % getme.config.qualityEvaluationCycleLength == 0
             qMinStar = getQMinStar(getme.minHeap)
             if qMinStar > bestQMinStarValue
@@ -123,7 +125,7 @@ function assessLocalQuality(getme::GetmeSequential, transformedPolygonIndex::Int
     if result.transformedElementMeanRatioNumber <= 0.0
         return result
     end
-    for neighborPolygonIndex in getme.mesh.getIndicesOfNeighborPolygons(transformedPolygonIndex)
+    for neighborPolygonIndex in Mesh.getIndicesOfNeighborPolygons(getme.mesh, transformedPolygonIndex)
         neighborMeanRatioNumber = Mathematics.getMeanRatio(polygons[neighborPolygonIndex], getme.temporaryNodes)
         # Preliminary termination if one neighbor was invalidated.
         if neighborMeanRatioNumber <= 0.0
@@ -136,7 +138,7 @@ function assessLocalQuality(getme::GetmeSequential, transformedPolygonIndex::Int
 end
 
 function copyNodes(getme::GetmeSequential, polygonIndex::Int, sourceNodes::Vector{Mathematics.Vector2D}, targetNodes::Vector{Mathematics.Vector2D})
-    for nodeIndex in Mesh.getNodeIndices(Mesh.getPolygons(getme.mesh)[polygonIndex])
+    for nodeIndex in Mathematics.getNodeIndices(Mesh.getPolygons(getme.mesh)[polygonIndex])
         targetNodes[nodeIndex] = sourceNodes[nodeIndex]
     end
 end

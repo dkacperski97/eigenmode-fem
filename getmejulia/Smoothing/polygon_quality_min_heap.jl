@@ -45,7 +45,7 @@ function Base.:<(a::MinHeapEntry, b::MinHeapEntry)
     end
 end
 
-function Base.:==(a::MinHeapEntry, b::MinHeapEntry)
+function Base.:(==)(a::MinHeapEntry, b::MinHeapEntry)
     return a.isFixedPolygon == b.isFixedPolygon && 
            a.penaltyCorrectedMeanRatioNumber == b.penaltyCorrectedMeanRatioNumber && 
            a.meanRatioNumber == b.meanRatioNumber && 
@@ -88,7 +88,7 @@ mutable struct PolygonQualityMinHeap
 
     function PolygonQualityMinHeap(mesh::Mesh.PolygonalMesh)
         polygonIndexToBinaryTreeEntryIndex = fill(typemax(Int), Mesh.getNumberOfPolygons(mesh))
-        binaryTree = Vector{MinHeapEntry}(undef,Mesh.getNumberOfPolygons(mesh))
+        binaryTree = Vector{MinHeapEntry}() # TODO: how to reserve space?
 
         heap = new(binaryTree, polygonIndexToBinaryTreeEntryIndex)
 
@@ -130,7 +130,9 @@ end
 
 function isConsistent(heap::PolygonQualityMinHeap)::Bool
     doSizesMatch = length(heap.binaryTree) == length(heap.polygonIndexToBinaryTreeEntryIndex)
-    return doSizesMatch && isPolygonIndexToBinaryTreeEntryIndexConsistent(heap) && isBinaryTreeConsistent(heap)
+    isPolygonIndexToBinaryTreeEntryIndexConsistentResult = isPolygonIndexToBinaryTreeEntryIndexConsistent(heap)
+    isBinaryTreeConsistentResult = isBinaryTreeConsistent(heap)
+    return doSizesMatch && isPolygonIndexToBinaryTreeEntryIndexConsistentResult && isBinaryTreeConsistentResult
 end
 
 function isPolygonIndexToBinaryTreeEntryIndexConsistent(heap::PolygonQualityMinHeap)::Bool
@@ -187,7 +189,9 @@ function containsAnInvalidPolygon(heap::PolygonQualityMinHeap)::Bool
 end
 
 function isFirstQualityLower(heap::PolygonQualityMinHeap, firstEntryIndex::Int, secondEntryIndex::Int)
-    return heap.binaryTree[firstEntryIndex] < heap.binaryTree[secondEntryIndex]
+    entry1 = heap.binaryTree[firstEntryIndex]
+    entry2 = heap.binaryTree[secondEntryIndex]
+    return entry1 < entry2
 end
 
 function swapMinHeapEntriesAndAdjustMapping(heap::PolygonQualityMinHeap, firstEntryIndex::Int, secondEntryIndex::Int)
@@ -234,5 +238,8 @@ function minHeapifyEntryOfPolygon(heap::PolygonQualityMinHeap, polygonIndex::Int
             # Polygon quality is smaller than both children.
             break
         end
+    end
+    if (length(heap.binaryTree) == length(heap.polygonIndexToBinaryTreeEntryIndex))
+        dump(isBinaryTreeConsistent(heap))
     end
 end

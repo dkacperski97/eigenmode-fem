@@ -1,6 +1,6 @@
 module Mesh
 
-import ..mathematics.Mathematics
+import ..Mathematics.Mathematics
 
 include("polygonal_mesh.jl")
 include("mesh_quality.jl")

@@ -19,10 +19,10 @@ function getRegularizingPolygonTransformations(
     transformationSet::PolygonTransformationSet)
     @assert maxNumberOfPolygonNodes >= 3 "Minimal valid number of polygon nodes is three."
     polygonTransformations = Vector{Mathematics.GeneralizedPolygonTransformation}(undef, maxNumberOfPolygonNodes + 1)
-    for numberOfPolygonNodes in 0:maxNumberOfPolygonNodes
-        polygonTransformations[numberOfPolygonNodes + 1] = numberOfPolygonNodes
+    for numberOfPolygonNodes in 1:maxNumberOfPolygonNodes
+        polygonTransformations[numberOfPolygonNodes] = Mathematics.GeneralizedPolygonTransformation(numberOfPolygonNodes)
     end
-    if transformationSet == PolygonTransformationSet.GETMeBookExamples
+    if transformationSet == GETMeBookExamples
         lambda = 0.5
         polygonTransformations[4] = Mathematics.GeneralizedPolygonTransformation(lambda, pi / 4.0)
         if maxNumberOfPolygonNodes >= 4

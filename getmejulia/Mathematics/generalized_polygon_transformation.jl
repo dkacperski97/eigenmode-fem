@@ -46,9 +46,9 @@ function getEigenvalues(gpt::GeneralizedPolygonTransformation, numberOfPolygonNo
     eigenvalues = zeros(numberOfPolygonNodes)
     w = complex(gpt.lambda, (1 - gpt.lambda) * tan(gpt.theta))
     r = exp(2im * π / numberOfPolygonNodes)
-    for k in 1:numberOfPolygonNodes
+    for k in 0:numberOfPolygonNodes-1
         magnitude = abs(1.0 - conj(w) + r^k * conj(w))
-        eigenvalues[k] = magnitude * magnitude
+        eigenvalues[k+1] = magnitude * magnitude
     end
     return eigenvalues
 end

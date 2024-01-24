@@ -1,6 +1,6 @@
 import .Mesh: PolygonalMesh, MeshQuality
 
-abstract type SmoothingResultBase
+struct SmoothingResultBase
     algorithmName::String
     mesh::Mesh.PolygonalMesh
     meshQuality::Mesh.MeshQuality
