@@ -18,7 +18,7 @@ function basicGetmeSimultaneous(mesh::Mesh.PolygonalMesh, config::BasicGetmeSimu
         maxSquaredNodeRelocationDistance = 0.0
         for nodeIndex in getNonFixedNodeIndices(mesh)
             newNodePosition = newNodePositions[nodeIndex] / length(getAttachedPolygonIndices(mesh, nodeIndex))
-            updateMaxSquaredNodeRelocationDistance(getNodes(mesh)[nodeIndex],
+            maxSquaredNodeRelocationDistance = updateMaxSquaredNodeRelocationDistance(getNodes(mesh)[nodeIndex],
                                                     newNodePosition,
                                                     maxSquaredNodeRelocationDistance)
             getMutableNodes(mesh)[nodeIndex] = newNodePosition

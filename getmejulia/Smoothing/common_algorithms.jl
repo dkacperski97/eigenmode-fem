@@ -33,6 +33,7 @@ function updateMaxSquaredNodeRelocationDistance(
     if squaredNodeRelocationDistance > maxSquaredNodeRelocationDistance
         maxSquaredNodeRelocationDistance = squaredNodeRelocationDistance
     end
+    maxSquaredNodeRelocationDistance
 end
 
 function transformAndScaleElement(
