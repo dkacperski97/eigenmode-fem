@@ -29,6 +29,8 @@ mutable struct PolygonalMesh
     end
 end
 
+Base.copy(mesh::PolygonalMesh) = PolygonalMesh(copy(mesh.nodes), copy(mesh.polygons), copy(mesh.fixedNodeIndices))
+
 getNodes(mesh::PolygonalMesh) = mesh.nodes
 getMutableNodes(mesh::PolygonalMesh) = mesh.nodes
 function setNodes(mesh::PolygonalMesh, newNodes::Vector{Mathematics.Vector2D})

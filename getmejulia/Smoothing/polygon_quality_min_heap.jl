@@ -239,7 +239,7 @@ function minHeapifyEntryOfPolygon(heap::PolygonQualityMinHeap, polygonIndex::Int
             break
         end
     end
-    if (length(heap.binaryTree) == length(heap.polygonIndexToBinaryTreeEntryIndex))
-        dump(isBinaryTreeConsistent(heap))
-    end
+    # if (length(heap.binaryTree) == length(heap.polygonIndexToBinaryTreeEntryIndex))
+    #     dump(isBinaryTreeConsistent(heap))
+    # end
 end
