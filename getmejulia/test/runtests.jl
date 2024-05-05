@@ -55,5 +55,7 @@ end
 
 end
 
-include("Smoothing/polygon_quality_min_heap_test.jl")
+include("Mesh/mesh_quality_test.jl")
+
+# include("Smoothing/polygon_quality_min_heap_test.jl")
 # include("Smoothing/common_algorithms_test.jl")
